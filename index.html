@@ -31,11 +31,11 @@
         .row {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 5px;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border: 1px solid #34495e;
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
         }
         .main-input-group {
@@ -43,15 +43,12 @@
             gap: 10px;
             align-items: center;
             width: 100%;
-            border-bottom: 1px solid #34495e;
-            padding-bottom: 10px;
         }
         .note-group {
             display: flex;
             gap: 10px;
             align-items: center;
             width: 100%;
-            padding-top: 5px;
         }
         input[type="text"] {
             flex: 1;
@@ -136,14 +133,14 @@
         <div id="rowContainer">
             <div class="row">
                 <div class="main-input-group">
-                    <div class="drag-handle">⋮⋮</div>
                     <input type="text" placeholder="Enter text, code, phone, email, or URL" aria-label="Input field for text">
-                    <button class="copy-btn">Copy</button>
-                    <span class="checkmark">✔</span>
-                    <button class="go-btn">Go</button>
+                    <div class="drag-handle">⋮⋮</div>
                 </div>
                 <div class="note-group">
                     <input type="text" placeholder="Add a note" class="note-input" aria-label="Input field for notes">
+                    <button class="copy-btn">Copy</button>
+                    <span class="checkmark">✔</span>
+                    <button class="go-btn">Go</button>
                     <button class="delete-btn">✕</button>
                 </div>
             </div>
@@ -210,7 +207,8 @@
                     event.target.closest(".row").remove();
                 }
                 if (event.target.classList.contains("copy-btn")) {
-                    const input = event.target.previousElementSibling;
+                    const row = event.target.closest(".row");
+                    const input = row.querySelector('.main-input-group input');
                     const checkmark = event.target.nextElementSibling;
 
                     navigator.clipboard.writeText(input.value)
@@ -224,19 +222,21 @@
                 }
 
                 if (event.target.classList.contains("go-btn")) {
-                    const input = event.target.previousElementSibling.previousElementSibling.previousElementSibling;
+                    const row = event.target.closest(".row");
+                    const input = row.querySelector('.main-input-group input');
                     let url = input.value.trim();
 
-                    if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
-                        url = "https://" + url;
-                        input.value = url;
-                    }
-
-                    try {
-                        new URL(url);
-                        window.open(url, "_blank");
-                    } catch (error) {
-                        alert("Please enter a valid URL");
+                    if (url) {
+                        if (!url.match(/^https?:\/\//i)) {
+                            url = "https://" + url;
+                            input.value = url;
+                        }
+                        try {
+                            new URL(url);
+                            window.open(url, "_blank");
+                        } catch (error) {
+                            alert("Please enter a valid URL");
+                        }
                     }
                 }
             });
@@ -246,14 +246,14 @@
                 newRow.className = "row";
                 newRow.innerHTML = `
                     <div class="main-input-group">
-                        <div class="drag-handle">⋮⋮</div>
                         <input type="text" placeholder="Enter text, code, phone, email, or URL" aria-label="Input field for text">
-                        <button class="copy-btn">Copy</button>
-                        <span class="checkmark">✔</span>
-                        <button class="go-btn">Go</button>
+                        <div class="drag-handle">⋮⋮</div>
                     </div>
                     <div class="note-group">
                         <input type="text" placeholder="Add a note" class="note-input" aria-label="Input field for notes">
+                        <button class="copy-btn">Copy</button>
+                        <span class="checkmark">✔</span>
+                        <button class="go-btn">Go</button>
                         <button class="delete-btn">✕</button>
                     </div>
                 `;
@@ -297,14 +297,14 @@
                             newRow.className = "row";
                             newRow.innerHTML = `
                                 <div class="main-input-group">
-                                    <div class="drag-handle">⋮⋮</div>
                                     <input type="text" value="${item.value}" placeholder="Enter text, code, phone, email, or URL" aria-label="Input field for text">
-                                    <button class="copy-btn">Copy</button>
-                                    <span class="checkmark">✔</span>
-                                    <button class="go-btn">Go</button>
+                                    <div class="drag-handle">⋮⋮</div>
                                 </div>
                                 <div class="note-group">
                                     <input type="text" value="${item.note}" placeholder="Add a note" class="note-input" aria-label="Input field for notes">
+                                    <button class="copy-btn">Copy</button>
+                                    <span class="checkmark">✔</span>
+                                    <button class="go-btn">Go</button>
                                     <button class="delete-btn">✕</button>
                                 </div>
                             `;
