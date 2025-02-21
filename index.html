@@ -17,8 +17,10 @@
             color: #ecf0f1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
+            padding: 20px 10px;
+            touch-action: none;
         }
         .container {
             display: flex;
@@ -27,6 +29,7 @@
             gap: 20px;
             max-width: 800px;
             width: 100%;
+            padding: 0 5px;
         }
         .row {
             display: flex;
@@ -158,23 +161,30 @@
             
             let draggedItem = null;
 
-            rowContainer.addEventListener('mousedown', (e) => {
+            rowContainer.addEventListener('touchstart', handleDragStart);
+            rowContainer.addEventListener('mousedown', handleDragStart);
+
+            function handleDragStart(e) {
                 if (e.target.classList.contains('drag-handle')) {
+                    e.preventDefault();
                     draggedItem = e.target.closest('.row');
                     draggedItem.classList.add('dragging');
                     
-                    document.addEventListener('mousemove', onMouseMove);
-                    document.addEventListener('mouseup', onMouseUp);
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('touchmove', onMove);
+                    document.addEventListener('mouseup', onEnd);
+                    document.addEventListener('touchend', onEnd);
                 }
-            });
+            }
 
-            function onMouseMove(e) {
+            function onMove(e) {
                 if (!draggedItem) return;
+                e.preventDefault();
                 
                 const rows = [...rowContainer.querySelectorAll('.row')];
                 const draggedIndex = rows.indexOf(draggedItem);
                 
-                const y = e.clientY;
+                const y = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
                 const siblings = rows.filter(row => row !== draggedItem);
                 
                 const sibling = siblings.find(sibling => {
@@ -193,13 +203,15 @@
                 }
             }
 
-            function onMouseUp() {
+            function onEnd(e) {
                 if (draggedItem) {
                     draggedItem.classList.remove('dragging');
                     draggedItem = null;
                 }
-                document.removeEventListener('mousemove', onMouseMove);
-                document.removeEventListener('mouseup', onMouseUp);
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchend', onEnd);
             }
 
             rowContainer.addEventListener("click", (event) => {
